@@ -1,0 +1,142 @@
+{
+  "info": {
+    "_postman_id": "6596c96e-3152-47ae-8e6c-2f19dfd28de4",
+    "name": "BooksCollection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "6948580"
+  },
+  "item": [
+    {
+      "name": "getAllBooks",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "localhost:8080/books",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "books"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "createBook",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n   \"id\":103,\r\n   \"title\":\"WimpyKid\",\r\n   \"author\":\"Jeffy\",\r\n   \"price\":250,\r\n   \"stock\":40\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:8080/books",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "books"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "getBookById",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:8080/books/103",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "books",
+            "103"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "updateBookById",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Spring Boot\",\r\n  \"author\": \"John\",\r\n  \"price\": 500,\r\n  \"stock\": 30\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:8080/books/101",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "books",
+            "101"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "deleteBookById",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n   \"title\":\"TenaliRaman\",\r\n   \"author\":\"Kumarasamy\",\r\n   \"price\":280,\r\n   \"stock\":10\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:8080/books/102",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "books",
+            "102"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

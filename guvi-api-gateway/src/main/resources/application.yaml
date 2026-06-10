@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: guvi-api-gateway
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: product-route
+              uri: lb://GUVI-PRODUCT-SERVICE
+              predicates:
+                - Path=/books/**
+
+            - id: order-route
+              uri: lb://GUVI-ORDER-SERVICE
+              predicates:
+                - Path=/orders/**
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE

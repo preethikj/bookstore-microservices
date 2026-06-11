@@ -6,6 +6,7 @@ import com.example.guvi.user.service.exception.UserExistException;
 import com.example.guvi.user.service.model.User;
 import com.example.guvi.user.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserResponseDto registerUser(UserRequestDto userRequestDto) {
 
@@ -39,7 +41,7 @@ public class UserService {
 
         return User.builder()
                 .username(requestDto.getUsername())
-                .password(requestDto.getPassword())
+                .password(passwordEncoder.encode(requestDto.getPassword()))
                 .role("CUSTOMER")
                 .build();
     }

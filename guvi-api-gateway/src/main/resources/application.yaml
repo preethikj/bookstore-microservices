@@ -17,6 +17,11 @@ spring:
               predicates:
                 - Path=/orders/**
 
+            - id: user-route
+              uri: lb://GUVI-USER-SERVICE
+              predicates:
+                - Path=/users/**
+
 server:
   port: 8080
 

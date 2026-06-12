@@ -3,11 +3,13 @@ package com.example.guvi.user.service.controller;
 import com.example.guvi.user.service.dto.request.UserRequestDto;
 import com.example.guvi.user.service.dto.response.LoginResponseDto;
 import com.example.guvi.user.service.dto.response.UserResponseDto;
+import com.example.guvi.user.service.security.JwtService;
 import com.example.guvi.user.service.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final JwtService jwtService;
 
     @GetMapping("/home")
     public String home(){
@@ -39,5 +42,17 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody UserRequestDto userRequestDto){
         return ResponseEntity.ok(userService.login(userRequestDto));
+    }
+
+    @GetMapping("/validate")
+    public ResponseEntity<String> validate(
+            @RequestParam String token) {
+
+        return ResponseEntity.ok(jwtService.extractUsername(token));
+    }
+
+    @GetMapping("/me")
+    public String me(Authentication authentication) {
+        return authentication.getName();
     }
 }

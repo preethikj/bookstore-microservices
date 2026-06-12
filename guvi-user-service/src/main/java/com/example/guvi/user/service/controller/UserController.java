@@ -1,6 +1,7 @@
 package com.example.guvi.user.service.controller;
 
 import com.example.guvi.user.service.dto.request.UserRequestDto;
+import com.example.guvi.user.service.dto.response.LoginResponseDto;
 import com.example.guvi.user.service.dto.response.UserResponseDto;
 import com.example.guvi.user.service.service.UserService;
 import jakarta.validation.Valid;
@@ -27,5 +28,16 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(createdUser);
+    }
+
+    /*@PostMapping("/login")
+    public ResponseEntity<UserResponseDto> login(@Valid @RequestBody UserRequestDto requestDto) {
+
+        return ResponseEntity.ok(userService.login(requestDto));
+    }*/
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody UserRequestDto userRequestDto){
+        return ResponseEntity.ok(userService.login(userRequestDto));
     }
 }

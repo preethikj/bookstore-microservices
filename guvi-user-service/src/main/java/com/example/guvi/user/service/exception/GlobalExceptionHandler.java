@@ -63,13 +63,13 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler(OrderNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponseDto handleOrderNotFoundException(OrderNotFoundException ex) {
+    @ExceptionHandler(InvalidCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponseDto handleInvalidCredentialsException(InvalidCredentialsException ex) {
         return ErrorResponseDto.builder()
                 .error(ex.getClass().getSimpleName())
                 .message(ex.getMessage())
-                .statusCode(HttpStatus.NOT_FOUND.value())
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .timeStamp(LocalDateTime.now())
                 .build();
     }

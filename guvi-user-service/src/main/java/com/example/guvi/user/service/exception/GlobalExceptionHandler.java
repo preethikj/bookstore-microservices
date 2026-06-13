@@ -7,119 +7,71 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // 1. REUSABLE BUILDER METHOD
+    private ErrorResponseDto buildErrorResponse(Exception ex, HttpStatus status, String customMessage) {
+        String message = (customMessage != null) ? customMessage : ex.getMessage();
+        return ErrorResponseDto.builder()
+                .error(ex.getClass().getSimpleName())
+                .message(message)
+                .statusCode(status.value())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
+    // 2. GROUPING BY STATUS CODES OR SPECIFIC LOGIC
     @ExceptionHandler(NullPointerException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponseDto handleNullPointerException(NullPointerException ex) {
-
-        return ErrorResponseDto.builder()
-                .error(ex.getClass().getName())
-                .message(ex.getMessage())
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .timeStamp(LocalDateTime.now())
-                .build();
-
+    public ResponseEntity<ErrorResponseDto> handleNullPointerException(NullPointerException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(buildErrorResponse(exception, HttpStatus.BAD_REQUEST, null));
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponseDto handleException(Exception ex) {
-
-        return ErrorResponseDto.builder()
-                .error(ex.getClass().getSimpleName())
-                .message(ex.getMessage())
-                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .timeStamp(LocalDateTime.now())
-                .build();
-    }
-
-    @ExceptionHandler(DuplicateResourceException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponseDto handleDuplicateResourceException(
-            DuplicateResourceException ex) {
-
-        return ErrorResponseDto.builder()
-                .error(ex.getClass().getSimpleName())
-                .message(ex.getMessage())
-                .statusCode(HttpStatus.CONFLICT.value())
-                .timeStamp(LocalDateTime.now())
-                .build();
+    @ExceptionHandler({DuplicateResourceException.class, UserExistException.class}) // Grouped together.
+    public ResponseEntity<ErrorResponseDto> handleConflictExceptions(Exception exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(buildErrorResponse(exception, HttpStatus.CONFLICT, null));
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorResponseDto handleInvalidCredentialsException(InvalidCredentialsException ex) {
-        return ErrorResponseDto.builder()
-                .error(ex.getClass().getSimpleName())
-                .message(ex.getMessage())
-                .statusCode(HttpStatus.UNAUTHORIZED.value())
-                .timeStamp(LocalDateTime.now())
-                .build();
+    public ResponseEntity<ErrorResponseDto> handleInvalidCredentialsException(InvalidCredentialsException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(buildErrorResponse(exception, HttpStatus.UNAUTHORIZED, null));
+    }
+
+    @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class}) // Security Grouped
+    public ResponseEntity<ErrorResponseDto> handleAccessDenied(Exception exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(buildErrorResponse(exception, HttpStatus.FORBIDDEN, "Access Denied"));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponseDto handleValidationException(
-            MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponseDto> handleValidationException(MethodArgumentNotValidException exception) {
+        //String validationMessage = exception.getBindingResult().getFieldError().getDefaultMessage();
+        String validationMessages = exception.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
 
-        String errorMessage = ex.getBindingResult()
-                .getFieldError()
-                .getDefaultMessage();
-
-        return ErrorResponseDto.builder()
+        // We override the error string here for better clarity
+        ErrorResponseDto error = ErrorResponseDto.builder()
                 .error("Validation Failed")
-                .message(errorMessage)
+                .message(validationMessages)
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .timeStamp(LocalDateTime.now())
                 .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-    @ExceptionHandler(UserExistException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponseDto handleUserExistException(
-            UserExistException ex) {
-
-        return ErrorResponseDto.builder()
-                .error(ex.getClass().getSimpleName())
-                .message(ex.getMessage())
-                .statusCode(HttpStatus.CONFLICT.value())
-                .timeStamp(LocalDateTime.now())
-                .build();
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponseDto> handleAccessDenied(
-            AccessDeniedException ex) {
-
-        ErrorResponseDto error = ErrorResponseDto.builder()
-                .timeStamp(LocalDateTime.now())
-                .error("AccessDeniedException")
-                .message("Access Denied")
-                .statusCode(HttpStatus.FORBIDDEN.value())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(error);
-    }
-
-
-    @ExceptionHandler(AuthorizationDeniedException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponseDto handleAuthorizationDeniedException(
-            AuthorizationDeniedException ex) {
-
-        return ErrorResponseDto.builder()
-                .error(ex.getClass().getSimpleName())
-                .message("Access Denied")
-                .statusCode(HttpStatus.FORBIDDEN.value())
-                .timeStamp(LocalDateTime.now())
-                .build();
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponseDto> handleGeneralException(Exception exception) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(buildErrorResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR, null));
     }
 }

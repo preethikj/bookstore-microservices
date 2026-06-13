@@ -2,6 +2,9 @@ package com.example.guvi.user.service.exception;
 
 import com.example.guvi.user.service.dto.response.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -50,19 +53,6 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler(InsufficientStockException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponseDto handleInsufficientStockException(
-            InsufficientStockException ex) {
-
-        return ErrorResponseDto.builder()
-                .error(ex.getClass().getSimpleName())
-                .message(ex.getMessage())
-                .statusCode(HttpStatus.CONFLICT.value())
-                .timeStamp(LocalDateTime.now())
-                .build();
-    }
-
     @ExceptionHandler(InvalidCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponseDto handleInvalidCredentialsException(InvalidCredentialsException ex) {
@@ -100,6 +90,35 @@ public class GlobalExceptionHandler {
                 .error(ex.getClass().getSimpleName())
                 .message(ex.getMessage())
                 .statusCode(HttpStatus.CONFLICT.value())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDto> handleAccessDenied(
+            AccessDeniedException ex) {
+
+        ErrorResponseDto error = ErrorResponseDto.builder()
+                .timeStamp(LocalDateTime.now())
+                .error("AccessDeniedException")
+                .message("Access Denied")
+                .statusCode(HttpStatus.FORBIDDEN.value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(error);
+    }
+
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponseDto handleAuthorizationDeniedException(
+            AuthorizationDeniedException ex) {
+
+        return ErrorResponseDto.builder()
+                .error(ex.getClass().getSimpleName())
+                .message("Access Denied")
+                .statusCode(HttpStatus.FORBIDDEN.value())
                 .timeStamp(LocalDateTime.now())
                 .build();
     }

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,11 +21,6 @@ public class UserController {
     private final UserService userService;
     private final JwtService jwtService;
 
-    @GetMapping("/home")
-    public String home(){
-        return "User Service Home Page";
-    }
-
     @PostMapping("/register")
     public ResponseEntity<UserResponseDto> register(@Valid @RequestBody UserRequestDto userRequestDto){
         UserResponseDto createdUser = userService.registerUser(userRequestDto);
@@ -33,26 +29,21 @@ public class UserController {
                 .body(createdUser);
     }
 
-    /*@PostMapping("/login")
-    public ResponseEntity<UserResponseDto> login(@Valid @RequestBody UserRequestDto requestDto) {
-
-        return ResponseEntity.ok(userService.login(requestDto));
-    }*/
-
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody UserRequestDto userRequestDto){
         return ResponseEntity.ok(userService.login(userRequestDto));
     }
 
-    @GetMapping("/validate")
-    public ResponseEntity<String> validate(
-            @RequestParam String token) {
-
-        return ResponseEntity.ok(jwtService.extractUsername(token));
-    }
-
-    @GetMapping("/me")
+    //Just created for testing purpose
+    /*@GetMapping("/me")
     public String me(Authentication authentication) {
         return authentication.getName();
+    }*/
+
+    //Only Admin have access to this endpoint
+    @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminOnly() {
+        return "Welcome Admin";
     }
 }

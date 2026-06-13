@@ -6,10 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import java.util.List;
 
 @Service
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 

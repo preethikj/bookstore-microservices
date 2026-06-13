@@ -16,4 +16,6 @@ public class UserRequestDto {
     private String username;
     @NotNull(message = "Password can't be empty")
     private String password;
+    private String role;
+
 }

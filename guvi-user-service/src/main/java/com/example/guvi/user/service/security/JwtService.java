@@ -33,8 +33,7 @@ public class JwtService {
     //Extract Username from token
     public String extractUsername(String token) {
 
-        return extractAllClaims(token)
-                .getSubject();
+        return extractAllClaims(token).getSubject();
     }
 
     private Claims extractAllClaims(String token) {
